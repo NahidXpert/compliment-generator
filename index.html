@@ -69,6 +69,116 @@
             100% { background-position: 0% 50%; }
         }
 
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; overflow: hidden; pointer-events: none;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: float 15s infinite ease-in-out alternate;
+        }
+        
+        .shape-1 { background: var(--color-brand-action); width: 300px; height: 300px; top: 10%; left: 10%; animation-delay: 0s; }
+        .shape-2 { background: var(--color-playful-accent); width: 400px; height: 400px; bottom: 20%; right: 5%; animation-delay: -5s; }
+        .shape-3 { background: #FBBF24; width: 250px; height: 250px; top: 40%; left: 50%; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        .playing-card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 2px rgba(255,255,255,0.5);
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .card-decor {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-bounce);
+        }
+
+        .decor-top-right {
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .decor-bottom-left {
+            bottom: 1.5rem;
+            left: 1.5rem;
+        }
+
+        .main-actions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            width: 100%;
+            margin-top: -0.5rem;
+        }
+
+        .primary-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-joke {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            padding: 0.85rem 3rem;
+            border-radius: var(--radius-full);
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-joke:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 25px -5px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-joke:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .joke-punchline {
+            display: inline-block;
+            font-weight: 700;
+            color: var(--color-brand-action);
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .joke-punchline.hidden {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
         h1, h2, h3, h4 {
             font-family: var(--font-display);
             font-weight: 700;
@@ -373,6 +483,12 @@
 </head>
 <body>
 
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
     <main class="app-container">
         
         <header class="header">
@@ -415,18 +531,29 @@
             </div>
         </section>
 
-        <section class="card display-section" aria-labelledby="display-title">
-            <h2 id="display-title" class="visually-hidden">Your Compliment</h2>
+        <section class="card display-section playing-card" aria-labelledby="display-title">
+            <div id="decor-tr" class="card-decor decor-top-right" style="background-color: #A1C4FD;">✨</div>
             
-            <div class="compliment-box" aria-live="polite" aria-atomic="true">
+            <h2 id="display-title" class="visually-hidden">Your Compliment or Joke</h2>
+            
+            <div class="compliment-box" style="background: none; box-shadow: none; border: none; min-height: auto;" aria-live="polite" aria-atomic="true">
                 <p id="compliment-output" class="compliment-text">
                     Select your options and hit generate! 🚀
                 </p>
             </div>
 
-            <button id="btn-generate" class="btn-primary" aria-label="Generate a new compliment">
-                Brew Compliment
-            </button>
+            <div id="decor-bl" class="card-decor decor-bottom-left" style="background-color: #FCE7F3;">🎲</div>
+        </section>
+
+        <div class="main-actions-container">
+            <div class="primary-buttons">
+                <button id="btn-generate" class="btn-primary" aria-label="Generate a new compliment">
+                    Brew Compliment
+                </button>
+                <button id="btn-joke" class="btn-joke" aria-label="Generate a random joke">
+                    Tell a Joke
+                </button>
+            </div>
 
             <div class="actions-group">
                 <button id="btn-copy" class="btn-secondary" aria-label="Copy to clipboard">
@@ -436,7 +563,7 @@
                     </svg>
                     Copy
                 </button>
-                <button id="btn-share" class="btn-secondary" aria-label="Share compliment">
+                <button id="btn-share" class="btn-secondary" aria-label="Share">
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                         <circle cx="18" cy="5" r="3"></circle>
                         <circle cx="6" cy="12" r="3"></circle>
@@ -447,7 +574,7 @@
                     Share
                 </button>
             </div>
-        </section>
+        </div>
 
         <section class="card history-section" aria-labelledby="history-title">
             <h2 id="history-title" class="history-title">Recent Magic ✨</h2>
@@ -466,213 +593,175 @@
         /**
          * Massive Compliment Database: Deeply expanded for maximum variety!
          */
+        const JOKES_DB = [
+            { s: "Why did the scarecrow win an award?", p: "Because he was outstanding in his field! 🌾" },
+            { s: "What do you call fake spaghetti?", p: "An impasta! 🍝" },
+            { s: "Why did the bicycle fall over?", p: "Because it was two tired! 🚲" },
+            { s: "What do you call cheese that isn't yours?", p: "Nacho cheese! 🧀" },
+            { s: "Why couldn't the leopard play hide and seek?", p: "Because he was always spotted! 🐆" },
+            { s: "How does a penguin build its house?", p: "Igloos it together! 🐧" },
+            { s: "Why did the math book look sad?", p: "Because it had too many problems! 📘" },
+            { s: "What do you call a bear with no teeth?", p: "A gummy bear! 🐻" },
+            { s: "Why did the cookie go to the hospital?", p: "Because it felt crummy! 🍪" },
+            { s: "What do you call a magic dog?", p: "A labracadabrador! 🐕" },
+            { s: "Why did the golfer bring two pairs of pants?", p: "In case he got a hole in one! ⛳" },
+            { s: "What do you call a laughing motorcycle?", p: "A Yamahahaha! 🏍️" },
+            { s: "Why do seagulls fly over the ocean?", p: "Because if they flew over the bay, they'd be bagels! 🥯" },
+            { s: "What do you get when you cross a snowman and a vampire?", p: "Frostbite! ⛄" },
+            { s: "Why did the tomato turn red?", p: "Because it saw the salad dressing! 🍅" },
+            { s: "What did one wall say to the other?", p: "I'll meet you at the corner! 🧱" },
+            { s: "Why did the stadium get hot after the game?", p: "Because all the fans left! 🏟️" },
+            { s: "What do you call a dinosaur that is sleeping?", p: "A dino-snore! 🦖" },
+            { s: "Why can't you give Elsa a balloon?", p: "Because she will let it go! 🎈" },
+            { s: "What did the zero say to the eight?", p: "Nice belt! 8️⃣" },
+            { s: "Why did the invisible man turn down the job offer?", p: "He couldn't see himself doing it! 🫥" },
+            { s: "What do you call a pig that does karate?", p: "A pork chop! 🥋" },
+            { s: "Why do bees have sticky hair?", p: "Because they use honeycombs! 🐝" },
+            { s: "What is an astronaut's favorite part on a computer?", p: "The space bar! 🧑‍🚀" },
+            { s: "Why did the picture go to jail?", p: "Because it was framed! 🖼️" },
+            { s: "How do you make a tissue dance?", p: "You put a little boogie in it! 🤧" },
+            { s: "What do you call a fish wearing a bowtie?", p: "Sofishticated! 🐟" },
+            { s: "Why did the banana go to the doctor?", p: "Because he wasn't peeling well! 🍌" },
+            { s: "What do you call a lazy kangaroo?", p: "A pouch potato! 🦘" },
+            { s: "Why are ghosts such bad liars?", p: "Because you can see right through them! 👻" },
+            { s: "What did the janitor say when he jumped out of the closet?", p: "Supplies! 🧹" },
+            { s: "Why did the cow cross the road?", p: "To get to the udder side! 🐄" },
+            { s: "What do you call a sleeping bull?", p: "A bulldozer! 🐂" },
+            { s: "Why did the coffee file a police report?", p: "It got mugged! ☕" },
+            { s: "What did the left eye say to the right eye?", p: "Between you and me, something smells! 👀" },
+            { s: "Why did the computer go to the doctor?", p: "Because it had a virus! 💻" },
+            { s: "What do you call a factory that makes okay products?", p: "A satisfactory! 🏭" },
+            { s: "Why did the pony get sent to his room?", p: "Because he wouldn't stop horsing around! 🐎" },
+            { s: "What did one plate say to the other?", p: "Dinner is on me! 🍽️" },
+            { s: "Why don't eggs tell jokes?", p: "They'd crack each other up! 🥚" },
+            { s: "What do you call an elephant that doesn't matter?", p: "An irrelephant! 🐘" },
+            { s: "Why did the boy bring a ladder to school?", p: "He wanted to go to high school! 🪜" },
+            { s: "What do you call a can opener that doesn't work?", p: "A can't opener! 🥫" },
+            { s: "Why did the melon jump into the lake?", p: "It wanted to be a water-melon! 🍉" },
+            { s: "What do you get when you cross a snail with a porcupine?", p: "A slowpoke! 🦔" },
+            { s: "Why did the tree go to the dentist?", p: "To get a root canal! 🌳" },
+            { s: "What do you call a shoe made out of a banana?", p: "A slipper! 🍌" },
+            { s: "Why was the broom late?", p: "It over-swept! 🧹" },
+            { s: "What do you call a funny mountain?", p: "Hill-arious! ⛰️" },
+            { s: "Why did the man put his money in the freezer?", p: "He wanted cold hard cash! 💵" }
+        ];
+
+        const DECOR_EMOJIS = ['✨', '⭐', '❤️', '🔥', '🎉', '🍀', '💎', '🚀', '🌟', '🎯', '🎨', '🧩', '🎈', '👑', '🌻', '🦋', '🌙', '⚡', '🌈', '🎲', '🍎', '🍕', '🎸', '🕹️'];
+        const DECOR_COLORS = ['#FF9A9E', '#FECFEF', '#A1C4FD', '#C2E9FB', '#FCE7F3', '#D1FAE5', '#FEE2E2', '#E0E7FF', '#FEF3C7', '#EDE9FE', '#CFFAFE', '#FFEDD5'];
+
         const COMPLIMENT_DB = {
             professional: {
                 coworker: [
-                    "Your spreadsheets are so organized, they make my heart sing. 📊",
-                    "If competence were a currency, you'd be a billionaire. 💰",
-                    "You’re the human equivalent of a 'Ctrl+S' right before the power goes out. 💾",
-                    "I'm pretty sure you debug faster than the speed of light. ⚡",
-                    "Your out-of-office messages are a masterclass in boundaries. 🏖️",
-                    "You manage projects better than a conductor leads an orchestra. 🎼",
-                    "Your attention to detail is so sharp, it could cut glass. 🔍",
-                    "If we had a 'Best Coworker' award, I'd rig the votes so you win. 🏆",
-                    "You survived another meeting that could have been an email. Legend. 📧",
-                    "Your coffee-to-productivity conversion rate is astounding. ☕",
-                    "You are the glue holding this project (and my sanity) together. 📎",
-                    "I’d trust you to deploy on a Friday at 4:59 PM. 🚀",
-                    "Your desk is a beacon of organization in a sea of chaos. 🗄️",
-                    "You always know exactly which Slack emoji to use. 🎯",
-                    "Your meeting agendas are so clear, they bring a tear to my eye. 📝",
-                    "You navigate office politics like a seasoned diplomat. 🤝",
-                    "You're the reason our team’s average IQ is so high. 🧠",
-                    "I genuinely look forward to reading your project updates. 📈",
-                    "You handle tight deadlines with the grace of a swan. 🦢",
-                    "Your feedback is always constructive, never destructive. 🛠️",
-                    "You're the MVP of resolving merge conflicts. ⚔️",
-                    "Even your pivot tables are things of beauty. 🎨"
+                    "You're the office equivalent of finding an extra fry at the bottom of the bag. 🍟",
+                    "I'm 90% sure you're three raccoons in a trench coat, but your Excel skills are undeniable. 🦝",
+                    "If we were trapped on a desert island, I'd trust you to organize the coconuts. 🥥",
+                    "You survive meetings that could have been emails with the stoicism of a true warrior. 🛡️",
+                    "Your ability to un-jam the printer makes you borderline magical. 🖨️✨",
+                    "I’d trust you to hold my coffee while I tie my shoe. That’s high praise. ☕",
+                    "You're the only reason I haven't replaced my keyboard out of frustration today. ⌨️",
+                    "Your Slack etiquette is so flawless it deserves its own documentary. 🎬",
+                    "If there was an Olympics for navigating office politics, you'd take the gold. 🥇",
+                    "You fix bugs so fast, I’m starting to think you planted them just to look cool. 🐛"
                 ],
                 partner: [
-                    "You are my favorite person to do absolutely nothing with. 🛋️",
-                    "Your ambition is incredibly attractive. Keep crushing it! 💼",
-                    "I’d share my fries with you, and that’s saying a lot. 🍟",
-                    "You're the only person I'd split the last slice of pizza with. 🍕",
-                    "You balance your dreams and our life like a true ninja. 🥷",
-                    "Your work ethic is inspiring, but your hugs are even better. 🤗",
-                    "I love how you organize our weekend plans. True leadership! 📅",
-                    "You handle life's plot twists with such grace. 🌪️",
-                    "You're my absolute favorite emergency contact. 📞",
-                    "Watching you achieve your goals is my favorite spectator sport. 🏅",
-                    "You're the CEO of my heart and the CFO of our snack budget. 🍿",
-                    "Your ability to remain calm when I can't find my keys is saintly. 🔑",
-                    "You do adulting better than anyone I know. 👔",
-                    "Your meal prep skills are worthy of a Michelin star. 🍱",
-                    "You make paying bills look almost fun. Almost. 💸",
-                    "You always remember to take the recycling out. Hero. ♻️",
-                    "I'd hire you as my life coach in a heartbeat. ⏱️",
-                    "You're the best co-pilot I could ever ask for. ✈️",
-                    "Your ability to fix things around the house is incredibly impressive. 🔧",
-                    "You always know exactly what to say to de-escalate my stress. 🧘",
-                    "You manage our shared calendar like an absolute pro. 🗓️"
+                    "You're the CEO of stealing all the blankets, but I respect your aggressive business strategy. 🛌",
+                    "I'd write a glowing LinkedIn recommendation for your ability to pick a place for dinner. 🍽️",
+                    "You fold laundry with the terrifying precision of a Swiss watchmaker. ⌚",
+                    "Your project management skills regarding our grocery list are truly top-tier. 🛒",
+                    "I love you even when you use my expensive scissors to open Amazon boxes. ✂️",
+                    "You manage our shared calendar so well, I almost know what we're doing this weekend. 🗓️",
+                    "You're my favorite person to do absolutely nothing productive with. 🛋️",
+                    "If being ridiculously good-looking was a job, you'd be getting overtime pay. 💸",
+                    "I'd promote you to 'Head of My Heart', but you already have tenure. ❤️",
+                    "You assemble IKEA furniture without yelling, which makes you a domestic superhero. 🦸"
                 ],
                 me: [
-                    "I am a professional masterpiece, still a work in progress. 🎨",
-                    "My to-do list cowers in fear when I wake up. 📝",
-                    "I have the wisdom of an owl and the persistence of a woodpecker. 🦉",
-                    "I survived 100% of my bad days so far. That’s an A+! 💯",
-                    "My inbox is afraid of my organizational skills. 🗂️",
-                    "I am the main character, and my character arc is thriving. 🌟",
-                    "I don't need luck, I have a perfectly color-coded calendar. 📆",
-                    "My brain is like a browser with 15 tabs open, but I'm handling it! 🌐",
-                    "I bring 'I got this' energy into every room I enter. 🚪",
-                    "I am a problem-solving wizard in business casual attire. 🧙‍♂️",
-                    "I deserve a raise just for remembering all my passwords. 🔐",
-                    "I am a magnet for success, good coffee, and great ideas. ☕",
-                    "My resume is basically a list of epic wins. 📜",
-                    "I can type faster than the speed of self-doubt. ⌨️",
-                    "I am crushing this 'being an adult' thing today. 🏢",
-                    "My boundaries are strong and my wifi is stable. 📶",
-                    "I am the architect of my own incredible career. 🏗️",
-                    "I handle constructive criticism like a champion. 🏆",
-                    "My LinkedIn profile is a work of absolute art. 🖼️",
-                    "I turn caffeine into pure, unadulterated excellence. 🍵",
-                    "I am fully capable of figuring out things I don't know yet. 🧠"
+                    "My ability to remember my password after only four attempts is a corporate asset. 🔐",
+                    "I'm not saying I'm Batman, but nobody has ever seen me and Batman in the same meeting. 🦇",
+                    "I bring 'chaotic good' energy to every spreadsheet I touch. 📊",
+                    "My coffee-to-productivity conversion rate defies the laws of thermodynamics. ☕",
+                    "I am a professional masterpiece, held together by caffeine and sheer willpower. 🎨",
+                    "I deserve a six-figure bonus just for keeping a straight face on Zoom today. 💻",
+                    "My 'out of office' auto-reply is a minor work of literary genius. 🏖️",
+                    "I am the undisputed champion of finding the best parking spot. 🚗",
+                    "I don't need a motivational poster; my browser history is inspiring enough. 🚀",
+                    "I'm an adulting prodigy. I even remembered to take the chicken out of the freezer. 🍗"
                 ]
             },
             hype: {
                 coworker: [
-                    "You are an absolute rockstar! The energy you bring is unmatched! 🎸",
-                    "Nobody crushes deadlines quite like you do. Legendary! 🐉",
-                    "You're not just moving the needle, you're breaking the whole scale! 📈",
-                    "You breathe fire and spit out completed tasks! 🔥",
-                    "Your ideas are so good they deserve their own parade! 🎉",
-                    "If awesome were a person, it would ask you for autographs! ✍️",
-                    "You're a productivity tornado, leaving only success in your wake! 🌪️",
-                    "Unstoppable. Unshakeable. Un-freaking-believable! 🚀",
-                    "You don't just step up to the plate, you hit it out of the park! ⚾",
-                    "The office plants grow faster just by absorbing your good vibes! 🌿",
-                    "You make the impossible look like a casual Tuesday! 🦸",
-                    "They need to invent a new word for how great you are doing! 🏆",
-                    "You’re a walking, talking masterclass in how to win! 🏅",
-                    "You drop brilliant ideas like they’re the hottest mixtapes! 📼",
-                    "Your brain belongs in the Hall of Fame! 🏛️",
-                    "You don't follow trends, you set the benchmark! 📏",
-                    "Every project you touch turns to absolute gold! 🥇",
-                    "You are a force of nature in a swivel chair! 🌪️",
-                    "I’m getting second-hand awesomeness just sitting near you! ✨",
-                    "You are playing chess while everyone else is playing checkers! ♟️"
+                    "You're a caffeine-fueled productivity wizard riding a laser shark! 🦈⚡",
+                    "If they made an action figure of you, it would just be a blurry streak of getting things done! 🌪️",
+                    "You don't just push the envelope, you fold it into an origami dragon and set it on fire! 🐉🔥",
+                    "Your ideas are so wild they need to be kept in a zoo! 🦁",
+                    "You bring so much energy to the team, my hair is static right now! ⚡",
+                    "You're not a snack, you're the whole breakroom vending machine! 🥨",
+                    "They should name a hurricane after you because you blow everyone away! 🌪️",
+                    "You're like a human exclamation point walking into the room! ❗",
+                    "Your brain moves so fast it gets speeding tickets in school zones! 🧠🏎️",
+                    "You’re the human equivalent of a double-shot espresso in a world of decaf! ☕🚀"
                 ],
                 partner: [
-                    "You are looking incredibly flawless today! Absolute fire! 🔥",
-                    "Every room you walk into instantly gets 100x better! ✨",
-                    "You're a powerhouse! Go out there and conquer the world! 🌍",
-                    "You're a limited edition, one-of-a-kind masterpiece! 🖼️",
-                    "Warning: Looking at you for too long may cause spontaneous smiling! 😄",
-                    "You're the absolute highlight of my timeline, in real life! 📸",
-                    "You've got that main character energy dialed up to 11! 🎬",
-                    "Your vibe is so good, it could charge a smartphone! 🔋",
-                    "You are serving 10/10 looks and a 20/10 personality! 💯",
-                    "I’m your biggest fan, and I don’t even need foam fingers! 📣",
-                    "If you were a vegetable, you'd be a cute-cumber! 🥒",
-                    "You're like a human confetti cannon of joy! 🎊",
-                    "You are dangerously good-looking today. Seriously, it's a hazard! ⚠️",
-                    "You make my heart do backflips like an Olympic gymnast! 🤸",
-                    "You are the ultimate prize, and somehow I won! 🎰",
-                    "You don't sweat, you just sparkle intensely! ✨",
-                    "You are the swagger champion of the universe! 🌌",
-                    "I'm pretty sure you invented being cool. 🧊",
-                    "You're a walking fireworks display! 🎆",
-                    "Your smile could literally power a small city! 🏙️"
+                    "You're so gorgeous you make onions cry tears of joy! 🧅😭",
+                    "If you were a triangle, you'd be acute one. Like, aggressively acute! 📐",
+                    "You're like a human confetti cannon going off in my living room! 🎊",
+                    "You have the kind of smile that makes me forget what I was saying. Wait, what was I saying? 🤔",
+                    "You're not just my other half, you're the side with the extra cheese! 🍕",
+                    "You're cooler than the other side of the pillow on a hot summer night! 🧊",
+                    "If awesomeness was a crime, you'd be serving multiple life sentences! 🚓",
+                    "You radiate so much heat, I'm surprised the smoke alarms don't go off! 🚨🔥",
+                    "You're basically a golden retriever in human form, but with much better hair! 🐕💇",
+                    "Your vibe is so immaculate it belongs in a museum behind laser grids! 🏛️"
                 ],
                 me: [
-                    "I am unstoppable today. Let's go get it! 🐯",
-                    "I am radiating confidence and main character energy! 👑",
-                    "Everything I touch turns to gold right now. I'm crushing it! ✨",
-                    "I'm not a snack, I'm the whole family-sized meal! 🍽️",
-                    "My swagger is on autopilot today. ✈️",
-                    "I woke up flawless, and it's only getting better from here! 🌅",
-                    "I am a hype machine fueled by pure awesomeness! 🚂",
-                    "I am out here glowing so bright I could be a lighthouse! 🗼",
-                    "There’s no mountain I can't climb today! 🏔️",
-                    "I’m dispensing high-fives to myself because I'm that good! 🙌",
-                    "Today’s forecast: 100% chance of me winning at everything! ☀️",
-                    "I'm basically a superhero, just waiting on my cape to dry-clean. 🦸‍♀️",
-                    "I am dropping jaws and taking names today! 📝",
-                    "My vibe is completely unmatched and utterly elite. 💎",
-                    "I am a walking, talking success story! 📖",
-                    "I’m so fly I might just take off into orbit. 🚀",
-                    "I am serving looks, brains, and boundless talent! 💅",
-                    "I am the boss level of my own life game! 🎮",
-                    "My reflection just gave me a high five. 🪞",
-                    "I am an absolute legend in the making. 🐉"
+                    "I'm a gloriously weird work in progress, and I am thriving! 🧟‍♀️✨",
+                    "I'm basically a walking, talking hype track! Drop the beat! 🎧",
+                    "I woke up looking like a snack, and now I'm a whole buffet! 🍝",
+                    "My swagger is currently at a level that science cannot explain! 🔬",
+                    "I am the main character, and the soundtrack playing in my head is epic! 🎸",
+                    "I'm so fly I might just need air traffic control clearance to leave the house! ✈️",
+                    "I'm an absolute legend. The myths just haven't been written yet! 📜",
+                    "I radiate so much main-character energy, reality is starting to warp around me! 🌀",
+                    "I'm not sweating, my awesomeness is just condensing! 💧",
+                    "I am a majestic unicorn tap-dancing on a rainbow of success! 🦄🌈"
                 ]
             },
             sincere: {
                 coworker: [
-                    "I genuinely appreciate the kindness you bring to the workplace. 🌻",
-                    "Thank you for always being someone I can count on for support. 🤝",
-                    "Your positive attitude makes the hardest days manageable. 🌤️",
-                    "The patience you show when helping others is truly beautiful. 🕊️",
-                    "You have a rare gift of making people feel heard and valued. 👂",
-                    "Our team is fundamentally better because you are a part of it. 🧩",
-                    "Thank you for creating a safe space for us to be ourselves. 🏡",
-                    "Your empathy is just as impressive as your skills. ❤️",
-                    "I always leave conversations with you feeling uplifted. 🎈",
-                    "You bring a gentle, calming presence that we all secretly need. 🍵",
-                    "It’s a privilege to work alongside someone with such a good heart. ⭐",
-                    "You make the daily grind feel a lot more like a pleasant walk. 🚶",
-                    "Thank you for always checking in on everyone. It matters. 💌",
-                    "Your authenticity is incredibly refreshing. 🍃",
-                    "You always remember the little details about people. 🔍",
-                    "Your quiet dedication never goes unnoticed. 🕯️",
-                    "You are a true pillar of support for this team. 🏛️",
-                    "I admire how you handle difficult situations with such grace. 🌊",
-                    "You bring out the very best in the people around you. 🌅",
-                    "Your sincerity makes this workplace feel like a community. 🏘️"
+                    "I'd totally share my apocalypse bunker with you. 🧟‍♂️🏕️",
+                    "You make the 3:00 PM slump feel slightly less like a hostage situation. 🕒",
+                    "I genuinely enjoy your weirdly specific desk decorations. 🪴",
+                    "You're the kind of person who warns others when the milk in the fridge is bad. A true hero. 🥛",
+                    "I love that we can communicate entirely through slightly raised eyebrows across the room. 🤨",
+                    "Your presence makes the unbearable meetings bearable. 🕊️",
+                    "I appreciate that you never judge my strange lunch combinations. 🥪",
+                    "You have a great laugh. It makes everyone else want to laugh too. 😂",
+                    "Thank you for being the designated bug-remover of the office. 🕷️",
+                    "You're a delightfully odd puzzle piece that fits our team perfectly. 🧩"
                 ],
                 partner: [
-                    "You make every day brighter just by being in it. ☀️",
-                    "I am so deeply grateful for your endless patience and love. 💖",
-                    "You have a beautiful soul that makes me feel completely at home. 🏠",
-                    "Thank you for loving me even when I'm being ridiculous. 🙃",
-                    "My favorite part of the day is whenever I'm with you. 🕰️",
-                    "You are my safe haven in a chaotic world. ⛵",
-                    "I didn't believe in soulmates until I met you. 🌌",
-                    "Your kindness towards others makes me love you even more. 🌷",
-                    "I cherish the tiny, quiet moments we share just as much as the big ones. ☕",
-                    "You make me want to be a better version of myself. 🌱",
-                    "There is nowhere else I'd rather be than by your side. 👫",
-                    "You are the calm to my storm and the joy in my heart. 🌈",
-                    "I feel so completely understood when I'm with you. 📖",
-                    "Your love is the foundation of all my happiness. 🧱",
-                    "You always know how to make me feel cherished. 🎁",
-                    "I am constantly in awe of your beautiful heart. ❤️",
-                    "Thank you for being my rock and my soft landing place. 🪨",
-                    "You are the most precious gift life has given me. 🎀",
-                    "I love growing older and wiser with you. 🌳",
-                    "My soul recognizes yours as its equal and its home. 🕊️"
+                    "You're my favorite person to annoy for the rest of my life. 🥰",
+                    "I love you more than I love hitting the snooze button on a Monday morning. ⏰",
+                    "I still get butterflies when you text me, mostly because I hope it's about dinner. 🦋🌮",
+                    "You're the only person I'd gladly share my fries with. 🍟",
+                    "I love that your weird matches my weird perfectly. 👽👾",
+                    "You make the mundane things, like grocery shopping, feel like a tiny adventure. 🥫",
+                    "I'd pick you even if you turned into a worm. (Probably). 🪱",
+                    "Your snores are just the background music to my favorite life. 💤🎶",
+                    "I love that we can be completely silent together and it’s not awkward at all. 🤫",
+                    "You are my favorite notification. 📱"
                 ],
                 me: [
-                    "I am worthy of rest, happiness, and all good things. 😌",
-                    "I forgive myself for mistakes and celebrate my genuine efforts. 🌿",
-                    "I am enough, exactly as I am right now. 🤍",
-                    "My feelings are valid, and my boundaries are important. 🛡️",
-                    "I am growing at my own pace, and that is perfectly okay. 🐢",
-                    "I give myself permission to let go of what I can't control. 🎈",
-                    "I have a good heart, and I deserve the love I give to others. 💖",
-                    "I am resilient, and I have overcome a lot to be here today. 🧗",
-                    "My self-worth is not tied to my productivity. 🧘",
-                    "I am beautifully human, flaws and all. 🌸",
-                    "I trust myself to make the best decisions for my life. 🧭",
-                    "I am doing the best I can, and my best is enough. 🌟",
-                    "I am proud of the person I am becoming. 🦋",
-                    "My mental health is a priority, and taking breaks is productive. 🛋️",
-                    "I hold space for my own healing and growth. 🌱",
-                    "I am surrounded by love, starting with the love I have for myself. ⭕",
-                    "I am brave for simply showing up today. 🛡️",
-                    "I treat myself with the same kindness I offer my best friends. 👯",
-                    "My journey is unique and absolutely beautiful. 🛤️",
-                    "I am a light in the world, even on my dark days. 🕯️"
+                    "I deserve all the naps and all the snacks today. 🥨😴",
+                    "My weirdness is actually my greatest superpower. 🦸‍♂️",
+                    "I am a wonderfully complex potato of a human being. 🥔",
+                    "I forgive myself for all the plants I accidentally killed this year. 🪴🪦",
+                    "I am entirely too hard on myself, considering how genuinely rad I am. 🛹",
+                    "My unique brand of quirkiness is exactly what the world needs more of. 🌎",
+                    "I'm doing a fantastic job keeping this meat-suit hydrated and functional. 💧",
+                    "I am an adorable weirdo and I completely embrace it. 🥸",
+                    "I am the captain of my own slightly wobbly, but very fun ship. ⛵",
+                    "I am allowed to be a glorious mess sometimes. 🎨"
                 ]
             }
         };
@@ -697,11 +786,16 @@
                     },
                     output: document.getElementById('compliment-output'),
                     btnGenerate: document.getElementById('btn-generate'),
+                    btnJoke: document.getElementById('btn-joke'),
                     btnCopy: document.getElementById('btn-copy'),
                     btnShare: document.getElementById('btn-share'),
                     historyList: document.getElementById('history-list'),
-                    toast: document.getElementById('toast')
+                    toast: document.getElementById('toast'),
+                    decorTr: document.getElementById('decor-tr'),
+                    decorBl: document.getElementById('decor-bl')
                 };
+                
+                this.punchlineTimeout = null;
 
                 this.init();
             }
@@ -718,10 +812,31 @@
                 this.elements.formGroups.target.forEach(el => el.addEventListener('change', updateState));
 
                 this.elements.btnGenerate.addEventListener('click', () => this.handleGenerate());
+                this.elements.btnJoke.addEventListener('click', () => this.handleGenerateJoke());
                 this.elements.btnCopy.addEventListener('click', () => this.handleCopy());
                 this.elements.btnShare.addEventListener('click', () => this.handleShare());
                 
                 if (!navigator.share) this.elements.btnShare.style.display = 'none';
+            }
+
+            updateCardDecor() {
+                const topEmoji = DECOR_EMOJIS[Math.floor(Math.random() * DECOR_EMOJIS.length)];
+                const bottomEmoji = DECOR_EMOJIS[Math.floor(Math.random() * DECOR_EMOJIS.length)];
+                const topColor = DECOR_COLORS[Math.floor(Math.random() * DECOR_COLORS.length)];
+                const bottomColor = DECOR_COLORS[Math.floor(Math.random() * DECOR_COLORS.length)];
+
+                this.elements.decorTr.style.backgroundColor = topColor;
+                this.elements.decorTr.textContent = topEmoji;
+                this.elements.decorTr.style.transform = `scale(1.3) rotate(${Math.random() * 30 - 15}deg)`;
+                
+                this.elements.decorBl.style.backgroundColor = bottomColor;
+                this.elements.decorBl.textContent = bottomEmoji;
+                this.elements.decorBl.style.transform = `scale(1.3) rotate(${Math.random() * 30 - 15}deg)`;
+
+                setTimeout(() => {
+                    this.elements.decorTr.style.transform = 'scale(1) rotate(0deg)';
+                    this.elements.decorBl.style.transform = 'scale(1) rotate(0deg)';
+                }, 400);
             }
 
             async fetchCompliment(tone, target) {
@@ -737,14 +852,16 @@
             async handleGenerate() {
                 if (this.state.isGenerating) return;
                 
-                this.setLoadingState(true);
-                // Remove animation class so we can trigger it again
+                if (this.punchlineTimeout) clearTimeout(this.punchlineTimeout);
+                
+                this.setLoadingState(true, 'compliment');
+                this.updateCardDecor();
                 this.elements.output.classList.remove('new-compliment');
 
                 try {
                     const compliment = await this.fetchCompliment(this.state.tone, this.state.target);
                     this.state.currentCompliment = compliment;
-                    this.elements.output.textContent = compliment;
+                    this.elements.output.innerHTML = compliment;
                     
                     // Force a reflow to restart CSS animation cleanly
                     void this.elements.output.offsetWidth;
@@ -754,14 +871,56 @@
                 } catch (error) {
                     this.elements.output.textContent = "Oops! Our servers are resting. Please try again. 💤";
                 } finally {
-                    this.setLoadingState(false);
+                    this.setLoadingState(false, 'compliment');
                 }
             }
 
-            setLoadingState(isLoading) {
+            async handleGenerateJoke() {
+                if (this.state.isGenerating) return;
+                
+                if (this.punchlineTimeout) clearTimeout(this.punchlineTimeout);
+
+                this.setLoadingState(true, 'joke');
+                this.updateCardDecor();
+                this.elements.output.classList.remove('new-compliment');
+
+                // Simulate fetch delay
+                await new Promise(resolve => setTimeout(resolve, 400));
+
+                const joke = JOKES_DB[Math.floor(Math.random() * JOKES_DB.length)];
+                this.state.currentCompliment = `${joke.s} ${joke.p}`;
+                
+                this.elements.output.innerHTML = `
+                    <span class="joke-setup">${joke.s}</span>
+                    <br><br>
+                    <span class="joke-punchline hidden" id="punchline-text">${joke.p}</span>
+                `;
+                
+                void this.elements.output.offsetWidth;
+                this.elements.output.classList.add('new-compliment');
+                
+                this.addToHistory(this.state.currentCompliment);
+                this.setLoadingState(false, 'joke');
+
+                // Delay the punchline reveal by 2.5 seconds for dramatic effect
+                this.punchlineTimeout = setTimeout(() => {
+                    const punchline = document.getElementById('punchline-text');
+                    if(punchline) {
+                        punchline.classList.remove('hidden');
+                    }
+                }, 2500);
+            }
+
+            setLoadingState(isLoading, type = 'compliment') {
                 this.state.isGenerating = isLoading;
                 this.elements.btnGenerate.disabled = isLoading;
-                this.elements.btnGenerate.textContent = isLoading ? 'Brewing Magic... ✨' : 'Brew Compliment';
+                this.elements.btnJoke.disabled = isLoading;
+                
+                if (type === 'compliment') {
+                    this.elements.btnGenerate.textContent = isLoading ? 'Brewing...' : 'Brew Compliment';
+                } else if (type === 'joke') {
+                    this.elements.btnJoke.textContent = isLoading ? 'Thinking...' : 'Tell a Joke';
+                }
                 
                 if (isLoading) {
                     this.elements.output.classList.add('loading-state');
