@@ -71,8 +71,6 @@ project-folder/
 └── README.md
 ```
 
-> The provided source contains the HTML, CSS, and JavaScript in one file.
-
 ## 🌐 Browser Compatibility
 
 Use a modern browser such as the latest version of Chrome, Edge, Firefox, or Safari. Sharing depends on browser and device support for the Web Share API. Clipboard behavior can also vary by browser and security context.
