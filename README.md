@@ -66,8 +66,8 @@ The project can be organized like this:
 
 ```text
 project-folder/
-├── index.html       # HTML, CSS, and JavaScript for the app
-├── favicon.png     # Optional favicon, if included
+├── index.html       
+├── yoruicci.png     
 └── README.md
 ```
 
